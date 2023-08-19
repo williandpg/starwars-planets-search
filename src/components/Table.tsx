@@ -1,9 +1,28 @@
+import React, { useState } from 'react';
 import usePlanets from '../api';
 import { PlanetsType } from '../types';
 
 function Table() {
+  const planetI = usePlanets();
+  const [planets, setPlanets] = useState('');
+  const filterPlanets = (event: PlanetsType[]) => {
+    const data = event.filter((planetTarget) => planetTarget.name.toLowerCase()
+      .includes(planets.toLowerCase()));
+    return data;
+  };
+
   return (
     <div>
+      <form>
+        <label htmlFor="filter">
+          Filter Planet
+          <input
+            type="text"
+            data-testid="name-filter"
+            onChange={ (event) => setPlanets(event.target.value) }
+          />
+        </label>
+      </form>
       <h1>Star Wars Planets</h1>
       <table>
         <thead>
@@ -24,7 +43,7 @@ function Table() {
           </tr>
         </thead>
         <tbody>
-          {usePlanets().map((planet: PlanetsType) => (
+          {filterPlanets(planetI).map((planet: PlanetsType) => (
             <tr key={ planet.name }>
               <td>{planet.name}</td>
               <td>{planet.rotation_period}</td>
