@@ -5,11 +5,9 @@
 }
 
 body {
-  font-family: "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  background-color: rgb(27, 27, 27);
-  color: rgb(255, 255, 255);
+  font-family: sans-serif;
+  background-color: gray;
+  color: white;
   font-size: 18px;
   line-height: 1.4;
 }
