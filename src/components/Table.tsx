@@ -7,6 +7,13 @@ const INITIAL_VALUE = {
   filterComparison: 'maior que',
   filterValue: 0,
 };
+const optionsFilter = [
+  'population',
+  'orbital_period',
+  'diameter',
+  'rotation_period',
+  'surface_water',
+];
 
 function Table() {
   // const planetI = usePlanets();
@@ -15,6 +22,7 @@ function Table() {
   const [listPlanets, setListPlanets] = useState(planets);
   const [filterList, setFilterList] = useState<PlanetsFilterType[]>([]);
   const [filterOption, setFilterOption] = useState(INITIAL_VALUE);
+  const [filtersColumn, setFiltersColumn] = useState<string[]>(optionsFilter);
   useEffect(() => {
     setListPlanets(planets);
   }, [planets]);
@@ -70,6 +78,21 @@ function Table() {
     });
     setFilterList(listOption);
   };
+  useEffect(() => {
+    if (filterList) {
+      const filterIns = filterList.map((item) => item.filterColumn);
+      const filterUp = optionsFilter.filter((item) => (
+        !filterIns.includes(item)
+      ));
+      setFiltersColumn(filterUp);
+      setFilterOption((prevFilterOption) => ({
+        ...prevFilterOption,
+        filterColumn: filterUp[0],
+      }));
+    } else {
+      setFiltersColumn(optionsFilter);
+    }
+  }, [filterList]);
 
   // const filterPlanets = (event: PlanetsType[]) => {
   //   const data = event.filter((planetTarget) => planetTarget.name.toLowerCase()
@@ -90,11 +113,14 @@ function Table() {
           onChange={ (event) => setFilterOption({
             ...filterOption, filterColumn: event.target.value }) }
         >
-          <option value="population">population</option>
+          {filtersColumn.map((item) => (
+            <option key={ item } value={ item }>{item}</option>
+          ))}
+          {/* <option value="population">population</option>
           <option value="orbital_period">orbital_period</option>
           <option value="diameter">diameter</option>
           <option value="rotation_period">rotation_period</option>
-          <option value="surface_water">surface_water</option>
+          <option value="surface_water">surface_water</option> */}
         </select>
         <select
           data-testid="comparison-filter"
@@ -119,6 +145,15 @@ function Table() {
           onClick={ handleFilter }
         >
           Filter Planets
+        </button>
+        <button
+          type="button"
+          onClick={ () => {
+            setListPlanets(planets);
+            setFilterList([]);
+          } }
+        >
+          Filter Remove
         </button>
         <h2>Filters</h2>
         <div>
