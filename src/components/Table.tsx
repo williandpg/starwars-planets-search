@@ -1,27 +1,142 @@
-import React, { useState } from 'react';
-import usePlanets from '../api';
-import { PlanetsType } from '../types';
+import React, { useState, useEffect, useContext } from 'react';
+import { PlanetsType, PlanetsFilterType } from '../types';
+import { PlanetsContext } from '../context/context';
+
+const INITIAL_VALUE = {
+  filterColumn: 'population',
+  filterComparison: 'maior que',
+  filterValue: 0,
+};
 
 function Table() {
-  const planetI = usePlanets();
-  const [planets, setPlanets] = useState('');
-  const filterPlanets = (event: PlanetsType[]) => {
-    const data = event.filter((planetTarget) => planetTarget.name.toLowerCase()
-      .includes(planets.toLowerCase()));
-    return data;
+  // const planetI = usePlanets();
+  // const [planets, setPlanets] = useState('');
+  const { planets } = useContext(PlanetsContext);
+  const [listPlanets, setListPlanets] = useState(planets);
+  const [filterList, setFilterList] = useState<PlanetsFilterType[]>([]);
+  const [filterOption, setFilterOption] = useState(INITIAL_VALUE);
+  useEffect(() => {
+    setListPlanets(planets);
+  }, [planets]);
+  const filterPlanets = (event: any) => {
+    const { value } = event.target;
+    const planetsIn = planets.filter((planet) => planet.name.includes(value));
+    setListPlanets(planetsIn);
   };
+  const handleFilter = () => {
+    const listOption = [...filterList, filterOption];
+    let planetsIn = planets;
+    listOption.forEach((item) => {
+      planetsIn = planetsIn.filter((planet: any) => {
+        if (item.filterComparison === 'maior que') {
+          return Number(planet[item.filterColumn]) > item.filterValue;
+        }
+        if (item.filterComparison === 'menor que') {
+          return Number(planet[item.filterColumn]) < item.filterValue;
+        }
+        if (item.filterComparison === 'igual a') {
+          return Number(planet[item.filterColumn]) === item.filterValue;
+        }
+        return true;
+      });
+    });
+    if (listOption.length === 0) {
+      planetsIn = planets;
+    }
+    setListPlanets(planetsIn);
+    setFilterList(listOption);
+  };
+  const handleClick = (item: PlanetsFilterType) => {
+    const listOption = filterList.filter((filterItem) => (
+      filterItem.filterColumn !== item.filterColumn
+      || filterItem.filterComparison !== item.filterComparison
+      || filterItem.filterValue !== item.filterValue
+    ));
+    let planetsIn = planets;
+    listOption.forEach((filterItem) => {
+      planetsIn = planetsIn.filter((planet: any) => {
+        if (filterItem.filterComparison === 'maior que') {
+          return Number(planet[filterItem.filterColumn]) > Number(filterItem.filterValue);
+        }
+        if (filterItem.filterComparison === 'menor que') {
+          return Number(planet[filterItem.filterColumn]) < Number(filterItem.filterValue);
+        }
+        if (filterItem.filterComparison === 'igual a') {
+          return Number(planet[filterItem.filterColumn])
+          === Number(filterItem.filterValue);
+        }
+        return true;
+      });
+    });
+    setFilterList(listOption);
+  };
+
+  // const filterPlanets = (event: PlanetsType[]) => {
+  //   const data = event.filter((planetTarget) => planetTarget.name.toLowerCase()
+  //     .includes(planets.toLowerCase()));
+  //   return data;
+  // };
 
   return (
     <div>
       <form>
-        <label htmlFor="filter">
-          Filter Planet
-          <input
-            type="text"
-            data-testid="name-filter"
-            onChange={ (event) => setPlanets(event.target.value) }
-          />
-        </label>
+        <input
+          type="text"
+          data-testid="name-filter"
+          onChange={ filterPlanets }
+        />
+        <select
+          data-testid="column-filter"
+          onChange={ (event) => setFilterOption({
+            ...filterOption, filterColumn: event.target.value }) }
+        >
+          <option value="population">population</option>
+          <option value="orbital_period">orbital_period</option>
+          <option value="diameter">diameter</option>
+          <option value="rotation_period">rotation_period</option>
+          <option value="surface_water">surface_water</option>
+        </select>
+        <select
+          data-testid="comparison-filter"
+          onChange={ (event) => setFilterOption({
+            ...filterOption, filterComparison: event.target.value }) }
+        >
+          <option value="maior que">maior que</option>
+          <option value="menor que">menor que</option>
+          <option value="igual a">igual a</option>
+        </select>
+        <input
+          type="number"
+          data-testid="value-filter"
+          defaultValue={ 0 }
+          onChange={ (event) => setFilterOption(
+            { ...filterOption, filterValue: Number(event.target.value) },
+          ) }
+        />
+        <button
+          type="button"
+          data-testid="button-filter"
+          onClick={ handleFilter }
+        >
+          Filter Planets
+        </button>
+        <h2>Filters</h2>
+        <div>
+          {filterList.map((item) => (
+            <div key={ item.filterColumn }>
+              <span>
+                {`${item.filterColumn} 
+              ${item.filterComparison} ${item.filterValue}`}
+              </span>
+              <button
+                type="button"
+                onClick={ () => handleClick(item) }
+              >
+                X
+              </button>
+            </div>
+          ))}
+        </div>
       </form>
       <h1>Star Wars Planets</h1>
       <table>
@@ -43,7 +158,7 @@ function Table() {
           </tr>
         </thead>
         <tbody>
-          {filterPlanets(planetI).map((planet: PlanetsType) => (
+          {listPlanets?.map((planet: PlanetsType) => (
             <tr key={ planet.name }>
               <td>{planet.name}</td>
               <td>{planet.rotation_period}</td>

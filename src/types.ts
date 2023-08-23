@@ -14,3 +14,9 @@ export type PlanetsType = {
   created: string;
   edited: string;
 };
+
+export type PlanetsFilterType = {
+  filterColumn: string;
+  filterComparison: string;
+  filterValue: number;
+};

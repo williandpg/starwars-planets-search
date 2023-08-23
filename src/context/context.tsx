@@ -1,11 +1,7 @@
 import { createContext } from 'react';
 import { PlanetsType } from '../types';
 
-export type ContextType = {
+export const PlanetsContext = createContext({
+  planets: [] } as {
   planets: PlanetsType[];
-  setPlanets: any;
-  planetsFiltered: (state: string) => void;
-  setPlanetsFiltered: string;
-};
-
-export const PlanetsContext = createContext({} as ContextType);
+});

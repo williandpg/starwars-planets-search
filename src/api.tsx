@@ -1,22 +1,14 @@
-import { useState, useEffect } from 'react';
+const URL_API = 'https://swapi.dev/api/planets/?format=json';
 
-const URL_API = 'https://swapi.dev/api/planets/';
+export const getPlanets = async () => {
+  const response = await fetch(URL_API);
+  const data = await response.json();
+  const { results } = data;
 
-function usePlanets() {
-  const [planets, setPlanets] = useState([]);
-  const getPlanets = async () => {
-    const response = await fetch(URL_API);
-    const data = await response.json();
-    data.results.forEach((planet: any) => {
-      delete planet.residents;
-    });
-    setPlanets(data.results);
-    return data.results;
-  };
-  useEffect(() => {
-    getPlanets();
-  }, []);
+  const planets = results.map((planet:any) => {
+    const { residents, ...rest } = planet;
+    return rest;
+  });
+
   return planets;
-}
-
-export default usePlanets;
+};
