@@ -31,6 +31,11 @@ function Table() {
     const planetsIn = planets.filter((planet) => planet.name.includes(value));
     setListPlanets(planetsIn);
   };
+  const removeFilters = () => {
+    setFilterOption(INITIAL_VALUE);
+    setListPlanets(planets);
+    setFilterList([]);
+  };
   const handleFilter = () => {
     const listOption = [...filterList, filterOption];
     let planetsIn = planets;
@@ -76,6 +81,7 @@ function Table() {
         return true;
       });
     });
+    setListPlanets(planetsIn);
     setFilterList(listOption);
   };
   useEffect(() => {
@@ -148,17 +154,15 @@ function Table() {
         </button>
         <button
           type="button"
-          onClick={ () => {
-            setListPlanets(planets);
-            setFilterList([]);
-          } }
+          data-testid="button-remove-filters"
+          onClick={ removeFilters }
         >
-          Filter Remove
+          Filters Remove
         </button>
         <h2>Filters</h2>
         <div>
           {filterList.map((item) => (
-            <div key={ item.filterColumn }>
+            <div key={ item.filterColumn } data-testid="filter">
               <span>
                 {`${item.filterColumn} 
               ${item.filterComparison} ${item.filterValue}`}
